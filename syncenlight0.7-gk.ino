@@ -1,6 +1,6 @@
 // SYNCENLIGHT BY NETZBASTELN
 // ZF18 Workshop version
-#define VERSION "0.6-nb"
+#define VERSION "0.6-gk"          // with code migration from ArduinoJson 5 to ArduinoJson 6
 
 #include <FS.h>                   // File system, this needs to be first.
 #include <ESP8266WiFi.h>          // ESP8266 Core WiFi Library
@@ -103,10 +103,9 @@ void setup() {
         // Allocate a buffer to store contents of the file.
         std::unique_ptr<char[]> buf(new char[size]);
         configFile.readBytes(buf.get(), size);
-        DynamicJsonBuffer jsonBuffer;
-        JsonObject& json = jsonBuffer.parseObject(buf.get());
-        json.printTo(Serial);
-        if (json.success()) {
+        DynamicJsonDocument json(1024);
+        auto error = serializeJson(json, Serial);
+        if (!error) {
           Serial.println("\nParsed json.");
           strcpy(mqtt_server, json["mqtt_server"]);
           strcpy(publish_topic, json["publish_topic"]);
@@ -152,16 +151,15 @@ void setup() {
   // Save the custom parameters to FS.
   if (shouldSaveConfig) {
     Serial.println("Saving config.");
-    DynamicJsonBuffer jsonBuffer;
-    JsonObject& json = jsonBuffer.createObject();
+    DynamicJsonDocument json(1024);
     json["mqtt_server"] = mqtt_server;
     json["publish_topic"] = publish_topic;
     File configFile = SPIFFS.open("/config.json", "w");
     if (!configFile) {
       Serial.println("Failed to open config file for writing.");
     }
-    json.printTo(Serial);
-    json.printTo(configFile);
+    serializeJson(json, Serial);
+    serializeJson(json, configFile);
     configFile.close();
   }
   // End save.
