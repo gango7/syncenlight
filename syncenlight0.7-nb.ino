@@ -1,6 +1,6 @@
 // SYNCENLIGHT BY NETZBASTELN
 // ZF18 Workshop version
-#define VERSION "0.6-gk"          // with code migration from ArduinoJson 5 to ArduinoJson 6
+#define VERSION "0.7-nb"          // with code migration from ArduinoJson 5 to ArduinoJson 6
 
 #include <FS.h>                   // File system, this needs to be first.
 #include <ESP8266WiFi.h>          // ESP8266 Core WiFi Library
